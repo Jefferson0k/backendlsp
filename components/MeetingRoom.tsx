@@ -59,24 +59,30 @@ const MeetingRoom = () => {
   const [recognizedWord, setRecognizedWord] = useState<string | null>(null);
   const { useCallCallingState } = useCallStateHooks();
   const [microphoneEnabled] = useState<boolean>(true);
+  const [activeButton, setActiveButton] = useState<string | null>(null);
 
   const callingState = useCallCallingState();
 
   const actionButtons = [
-    { name: 'Señal de colores', endpoint: '/lsp/recognize-colores/' },
-    { name: 'Señal de numeros', endpoint: '/lsp/recognize-numeros/' },
-    { name: 'Señal de prendas', endpoint: '/lsp/recognize-prendas/' },
-    { name: 'Señal de Saludos', endpoint: '/lsp/recognize-saludos/' },
+    { name: 'Señal de colores', endpoint: '/tasks/recognize-colores/' },
+    { name: 'Señal de numeros', endpoint: '/tasks/recognize-numeros/' },
+    { name: 'Señal de prendas', endpoint: '/tasks/recognize-prendas/' },
+    { name: 'Señal de Saludos', endpoint: '/tasks/recognize-saludos/' },
   ];
 
   const getGifForWord = (word: string) => {
     const sanitizedWord = word.toLowerCase().trim();
-    const gifPath = `/gif/${encodeURIComponent(sanitizedWord)}.gif`; // Usa encodeURIComponent para manejar caracteres especiales
+    const gifPath = `/gif/${encodeURIComponent(sanitizedWord)}.gif`; 
     console.log('Ruta del GIF:', gifPath);
     return gifPath;
   };
 
-  const startRecordingAndPredict = async (endpoint: string) => {
+  const startRecordingAndPredict = async (endpoint: string, buttonName: string) => {
+    if (recording) return; // Previene múltiples grabaciones simultáneas
+
+    setActiveButton(buttonName);
+    setRecording(true);
+
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
       const mediaRecorder = new MediaRecorder(stream);
       const chunks: Array<Blob> = [];
@@ -106,21 +112,21 @@ const MeetingRoom = () => {
           console.log('Predicción recibida:', result.action);
           setPrediction(result.action);
   
-          // Reproducir el audio correspondiente
           playAudioForAction(result.action);
         } catch (error) {
           console.error('Error al enviar el video:', error);
           setPrediction('Error en la predicción');
+        } finally {
+          setRecording(false);
+          setActiveButton(null);
         }
       };
   
       mediaRecorder.start();
-      setRecording(true);
   
       setTimeout(() => {
         mediaRecorder.stop();
-        setRecording(false);
-      }, 5000); // 10 segundos de grabación
+      }, 5000); // 5 segundos de grabación
     });
   };
   
@@ -241,11 +247,11 @@ const MeetingRoom = () => {
         {actionButtons.map((button, index) => (
           <button
             key={index}
-            onClick={() => startRecordingAndPredict(button.endpoint)}
-            className="btn-recording w-48"
+            onClick={() => startRecordingAndPredict(button.endpoint, button.name)}
+            className={`btn-recording w-48 ${activeButton === button.name ? 'bg-red-500' : ''}`}
             disabled={recording}
           >
-            {recording ? 'Procesando...' : button.name}
+            {activeButton === button.name ? 'Procesando...' : button.name}
           </button>
         ))}
       </div>
