@@ -62,6 +62,13 @@ const MeetingRoom = () => {
 
   const callingState = useCallCallingState();
 
+  const actionButtons = [
+    { name: 'Señal de colores', endpoint: '/lsp/recognize-colores/' },
+    { name: 'Señal de numeros', endpoint: '/lsp/recognize-numeros/' },
+    { name: 'Señal de prendas', endpoint: '/lsp/recognize-prendas/' },
+    { name: 'Señal de Saludos', endpoint: '/lsp/recognize-saludos/' },
+  ];
+
   const getGifForWord = (word: string) => {
     const sanitizedWord = word.toLowerCase().trim();
     const gifPath = `/gif/${encodeURIComponent(sanitizedWord)}.gif`; // Usa encodeURIComponent para manejar caracteres especiales
@@ -69,7 +76,7 @@ const MeetingRoom = () => {
     return gifPath;
   };
 
-  const startRecordingAndPredict = () => {
+  const startRecordingAndPredict = async (endpoint: string) => {
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
       const mediaRecorder = new MediaRecorder(stream);
       const chunks: Array<Blob> = [];
@@ -86,7 +93,7 @@ const MeetingRoom = () => {
         formData.append('file', videoBlob, 'señas.mp4');
   
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/lsp/recognize-actions-from-video/`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
             method: 'POST',
             body: formData,
           });
@@ -209,20 +216,20 @@ const MeetingRoom = () => {
       </div>
 
       {recognizedWord && !recording && (
-  <div className="image-container">
-    <img
-      src={getGifForWord(recognizedWord)}
-      alt={`GIF for ${recognizedWord}`}
-      width={500}
-      height={300}
-      onError={(e) => {
-        const imgElement = e.target as HTMLImageElement;
-        imgElement.src = '/gif/no.png'; // Asegúrate de que esta ruta sea correcta
-      }}
-      className="image-size"
-    />
-  </div>
-)}
+        <div className="image-container">
+          <img
+            src={getGifForWord(recognizedWord)}
+            alt={`GIF for ${recognizedWord}`}
+            width={500}
+            height={300}
+            onError={(e) => {
+              const imgElement = e.target as HTMLImageElement;
+              imgElement.src = '/gif/no.png'; // Asegúrate de que esta ruta sea correcta
+            }}
+            className="image-size"
+          />
+        </div>
+      )}
  
       {prediction && (
         <div className="prediction-container">
@@ -230,14 +237,17 @@ const MeetingRoom = () => {
         </div>
       )}
 
-      <div className="absolute left-10 top-32 p-4">
-      <button
-          onClick={startRecordingAndPredict}
-          className="btn-recording"
-          disabled={recording}
-        >
-          {recording ? 'Grabando...' : 'Grabar Señal'}
-        </button>
+      <div className="absolute left-10 top-32 p-4 flex flex-col space-y-4">
+        {actionButtons.map((button, index) => (
+          <button
+            key={index}
+            onClick={() => startRecordingAndPredict(button.endpoint)}
+            className="btn-recording w-48"
+            disabled={recording}
+          >
+            {recording ? 'Procesando...' : button.name}
+          </button>
+        ))}
       </div>
 
       <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
