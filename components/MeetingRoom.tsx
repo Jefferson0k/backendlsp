@@ -64,10 +64,10 @@ const MeetingRoom = () => {
   const callingState = useCallCallingState();
 
   const actionButtons = [
-    { name: 'Señal de colores', endpoint: '/tasks/recognize-colores/' },
-    { name: 'Señal de numeros', endpoint: '/tasks/recognize-numeros/' },
-    { name: 'Señal de prendas', endpoint: '/tasks/recognize-prendas/' },
-    { name: 'Señal de Saludos', endpoint: '/tasks/recognize-saludos/' },
+    { name: 'colores', endpoint: '/tasks/recognize-colores/' },
+    { name: 'numeros', endpoint: '/tasks/recognize-numeros/' },
+    { name: 'prendas', endpoint: '/tasks/recognize-prendas/' },
+    { name: 'Saludos', endpoint: '/tasks/recognize-saludos/' },
   ];
 
   const getGifForWord = (word: string) => {
