@@ -65,9 +65,11 @@ const MeetingRoom = () => {
 
   const actionButtons = [
     { name: 'colores', endpoint: '/tasks/recognize-colores/' },
-    { name: 'numeros', endpoint: '/tasks/recognize-numeros/' },
-    { name: 'prendas', endpoint: '/tasks/recognize-prendas/' },
+    { name: 'decisiones', endpoint: '/tasks/recognize-decisiones/' },
+    { name: 'Dias', endpoint: '/tasks/recognize-dias/' },
+    { name: 'Numeros', endpoint: '/tasks/recognize-numeros/' },
     { name: 'Saludos', endpoint: '/tasks/recognize-saludos/' },
+    { name: 'Pronombres', endpoint: '/tasks/recognize-pronombres/' },
   ];
 
   const getGifForWord = (word: string) => {
