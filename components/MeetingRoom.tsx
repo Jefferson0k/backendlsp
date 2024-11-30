@@ -70,6 +70,7 @@ const MeetingRoom = () => {
     { name: 'Numeros', endpoint: '/tasks/recognize-numeros/' },
     { name: 'Saludos', endpoint: '/tasks/recognize-saludos/' },
     { name: 'Pronombres', endpoint: '/tasks/recognize-pronombres/' },
+    
   ];
 
   const getGifForWord = (word: string) => {
